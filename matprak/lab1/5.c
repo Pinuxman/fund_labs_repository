@@ -92,7 +92,7 @@ void a(char* c_eps, char* c_x, double* result){
     double tmp = 1.0;
     int n = 1;
 
-    while (fabs(tmp) >= eps) 
+    while (fabs(tmp) > eps) 
     {
         *result += tmp;
         tmp *= x / n;
@@ -129,7 +129,7 @@ void d(char* c_eps, char* c_x, double* result){
     double eps = atof(c_eps);
     double x = atof(c_x);
     *result = 0.0;
-    double tmp = 1.0;   
+    double tmp = -1.0 * x * x / 2.0;;   
     int n = 1;
     while(fabs(tmp) > eps)
     {
@@ -146,6 +146,11 @@ int main(int argc, char** argv){
         return INVALID_INPUT;
     }
     double result;
+    if (atof(argv[1]) == 0.)
+    {
+        puts("0 - недопустимое значение эпсилона");
+        return 1;
+    }
     a(argv[1], argv[2], &result);
     printf("%.10f\n", result);
     b(argv[1], argv[2], &result);
