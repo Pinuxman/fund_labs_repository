@@ -48,9 +48,7 @@ int is_prime(int number){
     {
         if (number % i == 0) 
         {
-            temp++;
             return IS_COMPOSITE;
-            break;
         }
     }
     if (!temp) 
@@ -128,12 +126,18 @@ int main(int argc, char** argv){
             {
                 puts("Числа не должны не превышать 100");
             }
+            else if (num == 0)
+            {
+                puts("Число не может быть нулем");
+                break;
+            }
             else 
             {
                 int* result = (int*)malloc(100 * sizeof(int));
                 if (result == NULL)
                 {
                     puts("Маллок упал");
+                    return 1;
                 }
                 int count;
                 counter(num, &result, &count);
@@ -152,11 +156,11 @@ int main(int argc, char** argv){
             {
                 puts("Число простое");
             }
-            if (is_prime(num) == IS_COMPOSITE)
+            else if (is_prime(num) == IS_COMPOSITE)
             {
                 puts("Число составное");
             }
-            if (is_prime(num) == IS_NOT_COMPOSITE_OR_PRIME)
+            else if (is_prime(num) == IS_NOT_COMPOSITE_OR_PRIME)
             {
                 puts("Число не является простым или составным");
             }
@@ -179,6 +183,7 @@ int main(int argc, char** argv){
             unsigned int s;
             sum(num, &s);
             printf("Сумма %d членов равна: %d\n", num, s);
+            break;
         }
         case 'f':
         {
