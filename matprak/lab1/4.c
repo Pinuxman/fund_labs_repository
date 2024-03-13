@@ -9,20 +9,6 @@ typedef enum{
     FILE_ERROR,
 }status_code;
 
-status_code validator(int argc, char** argv){
-    if (argc < 3 || argc > 4)
-    {
-        puts("Параметров должно быть либо 3 либо 4");
-        return FLAG_ERROR;
-    }
-}
-
-char* out_prefix_add(char* in){
-    char _out[20] = "out_";
-    strcat(_out, in);
-    return _out;
-}
-
 status_code remove_arabic_nums(const char* in_filename, const char* out_filename){
     char digit;
     FILE* in = fopen(in_filename, "r");
@@ -33,6 +19,7 @@ status_code remove_arabic_nums(const char* in_filename, const char* out_filename
     FILE* out = fopen(out_filename, "w");
     if (out == NULL)
     {
+        fclose(in);
         return FILE_ERROR;
     }
     while ((digit = fgetc(in)) != EOF)
@@ -46,7 +33,7 @@ status_code remove_arabic_nums(const char* in_filename, const char* out_filename
     fclose(out);
     return OK;
 }
-status_code latin_symbols_count(const char* in_filename, const char* out_filename){
+status_code latin_symbols_count(char const* in_filename,char const* out_filename){
     int count = 0;
     FILE* in = fopen(in_filename, "r");
     if (in == NULL)
@@ -76,18 +63,17 @@ status_code latin_symbols_count(const char* in_filename, const char* out_filenam
     fclose(out);
     return OK;
 }
-status_code non_latin_arabic_space(const char* in_filename, const char* out_filename){
+status_code non_latin_arabic_space(char const* in_filename, char const* out_filename){
     int count = 0;
     FILE* in = fopen(in_filename, "r");
     if (in == NULL)
     {
-        fclose(in);
         return FILE_ERROR;
     }
     FILE* out = fopen(out_filename, "w");
     if (out == NULL)
     {
-        fclose(out);
+        fclose(in);
         return FILE_ERROR;
     }
     char non_latin_arabic_space;
@@ -107,17 +93,16 @@ status_code non_latin_arabic_space(const char* in_filename, const char* out_file
     fclose(out);
     return OK;
 }
-status_code hex_ascii_non_digit(const char* in_filename, const char* out_filename){
+status_code hex_ascii_non_digit(char const* in_filename, char const* out_filename){
     FILE* in = fopen(in_filename, "r");
     if (in == NULL)
     {
-        fclose(in);
         return FILE_ERROR;
     }
     FILE* out = fopen(out_filename, "w");
     if (out == NULL)
     {
-        fclose(out);
+        fclose(in);
         return FILE_ERROR;
     }
     char hex_ascii_non_digit;
@@ -136,73 +121,105 @@ status_code hex_ascii_non_digit(const char* in_filename, const char* out_filenam
     fclose(out);
     return OK;
 }
-int main(int argc, char** argv){
-    if (validator(argc, argv) == FLAG_ERROR)
+
+status_code validator(int argc, char** argv)
+{
+    if (argc < 3 || argc > 4)
     {
-        return 1;
+        return FLAG_ERROR;
     }
+
+    if(argv[1][0] != '-' && argv[1][0] != '/')
+    {
+        return FLAG_ERROR;
+    }
+
+    if (argv[1][1] == 'n' && argc != 4 && strlen(argv[1]) != 3)
+    {
+        return FLAG_ERROR;
+    }
+
     if (argv[1][1] == 'n')
     {
-        switch (argv[1][2])
+        if(strcmp(argv[2], argv[3]) == 0)
         {
-        case 'd':
-        {
-            remove_arabic_nums(argv[2], argv[3]);
-            break;
-        }
-        case 'i':
-        {
-            latin_symbols_count(argv[2], argv[3]);
-            break;   
-        }
-        case 's':
-        {
-            non_latin_arabic_space(argv[2], argv[3]);
-            break;
-        }
-        case 'a':
-        {
-            hex_ascii_non_digit(argv[2], argv[3]);
-            break;
-        }
-        default:
-            break;
+            return FLAG_ERROR;
         }
     }
-    else if(argc == 3)
+
+    return OK;
+}
+
+int main(int argc, char** argv)
+{
+    if (validator(argc, argv) == FLAG_ERROR)
     {
-        char* out_prefix = (char*)malloc(sizeof(char) * BUFSIZ);
-        if (out_prefix == NULL)
-        {
-            puts("Ошибка памяти");
-            return 1;
-        }
-        strcpy(out_prefix, argv[2]);
-        switch (argv[1][1])
-        {
-        case 'd':
-        {
-            remove_arabic_nums(argv[2], out_prefix_add(out_prefix));
-            break;
-        }
-        case 'i':
-        {
-            latin_symbols_count(argv[2], out_prefix_add(out_prefix));
-            break;   
-        }
-        case 's':
-        {
-            non_latin_arabic_space(argv[2], out_prefix_add(out_prefix));
-            break;
-        }
-        case 'a':
-        {
-            hex_ascii_non_digit(argv[2], out_prefix_add(out_prefix));
-            break;
-        }
-        default:
-            break;
-        }
-        free(out_prefix);
+        printf("invalid input\n");
+        return FLAG_ERROR;
     }
+
+    char flag;
+    char* input_file = argv[2];
+    char* output_file = NULL;
+
+    if (argv[1][1] == 'n')
+    {
+        flag = argv[1][2];
+        output_file = argv[3];
+    }
+    else
+    {
+        flag = argv[1][1];
+        output_file = (char*)malloc(strlen(argv[2]) + 5);
+        if (!output_file)
+        {
+            printf("failed to allocate memory");
+            return FLAG_ERROR;
+        }
+
+        strcpy(output_file, "out_");
+        strcat(output_file, argv[2]);
+
+    }
+    switch (flag)
+    {
+        case 'd':
+            if((remove_arabic_nums(input_file, output_file)) == FILE_ERROR)
+            {
+                printf("error with opening files");
+                return FILE_ERROR;
+            }
+            break;
+
+        case 'i':
+
+            if (latin_symbols_count(input_file, output_file) == FILE_ERROR)
+            {
+                printf("error with opening files");
+                return FILE_ERROR;
+            }
+            break;
+
+        case 's':
+            if(non_latin_arabic_space(input_file, output_file) == FILE_ERROR)
+            {
+                printf("error with opening files");
+                return FILE_ERROR;
+            }
+            break;
+
+        case 'a':
+            if(hex_ascii_non_digit(input_file, output_file) == FILE_ERROR)
+            {
+                printf("error with opening files");
+                return FILE_ERROR;
+            }
+            break;
+
+        default:
+            printf("invalid flag\n");
+            break;
+    }
+    free(output_file);
+    return 0;
 }
