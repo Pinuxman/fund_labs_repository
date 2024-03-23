@@ -1,3 +1,0 @@
-/Users/greg/CLionProjects/task10/cmake-build-debug/CMakeFiles/task10.dir
-/Users/greg/CLionProjects/task10/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/greg/CLionProjects/task10/cmake-build-debug/CMakeFiles/rebuild_cache.dir

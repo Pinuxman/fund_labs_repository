@@ -196,21 +196,16 @@ void free_everything(int amount, ...) {
 }
 
 int main() {
-    // Пути к файлам с данными остановочных пунктов
     char* filePaths[] = {"file1.txt", "file2.txt", "file3.txt"};
-
-    // Ваш код для обработки данных с остановочных пунктов
 
     int numRoutes = sizeof(filePaths) / sizeof(filePaths[0]);
     VehicleRoute* vehicleRoutes = (VehicleRoute*)malloc(numRoutes * sizeof(VehicleRoute));
 
-    // Инициализация данных о маршрутах транспортных средств
     for (int i = 0; i < numRoutes; i++) {
         strcpy(vehicleRoutes[i].location, filePaths[i]);
         vehicleRoutes[i].route = NULL;
     }
 
-    // Взаимодействие с пользователем
     int choice;
     do {
         printf("\nМеню:\n");

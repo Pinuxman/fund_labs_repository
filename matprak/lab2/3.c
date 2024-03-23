@@ -13,6 +13,7 @@ typedef enum {
 void print_info (int line, int symbol) {
     printf("Line № %d symbol № %d\n", line, symbol);
 }
+
 status_code substr_search (char* substr, FILE** file) {
     char c, check_n;
     size_t len = strlen(substr);
